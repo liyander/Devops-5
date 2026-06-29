@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Route Table - Fixed with NAT Gateway route for internet access
+
+Resources:
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EIP.AllocationId
+      SubnetId: subnet-public-1
+
+  EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  PrivateRouteTableFixed:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: vpc-0abc123def456
+
+  RouteToNAT:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableFixed
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway
+
+  PrivateSubnetRouteTableAssoc1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: subnet-0a1b2c3d4e5f6a7b8
+      RouteTableId: !Ref PrivateRouteTableFixed
+
+  PrivateSubnetRouteTableAssoc2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: subnet-8b7a6f5e4d3c2b1a0
+      RouteTableId: !Ref PrivateRouteTableFixed

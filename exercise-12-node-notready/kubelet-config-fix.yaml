@@ -1,0 +1,19 @@
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+evictionHard:
+  imagefs.available: "15%"
+  memory.available: "100Mi"
+  nodefs.available: "10%"
+  nodefs.inodesFree: "5%"
+evictionSoft:
+  imagefs.available: "20%"
+  memory.available: "200Mi"
+  nodefs.available: "15%"
+  nodefs.inodesFree: "10%"
+evictionSoftGracePeriod:
+  imagefs.available: "2m"
+  memory.available: "2m"
+  nodefs.available: "2m"
+  nodefs.inodesFree: "2m"
+containerLogMaxSize: "50Mi"
+containerLogMaxFiles: 5

@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Security Group for EKS nodes - Fixed (allows HTTPS egress for DynamoDB)
+
+Resources:
+  NodeSecurityGroupFixed:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EKS Node Security Group - Fixed
+      VpcId: vpc-0abc123def456
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 10.0.0.0/16
+        - IpProtocol: tcp
+          FromPort: 10250
+          ToPort: 10250
+          CidrIp: 10.0.0.0/16
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  DynamoDBVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: vpc-0abc123def456
+      ServiceName: com.amazonaws.ap-south-1.dynamodb
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - rtb-0abc123def456

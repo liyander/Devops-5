@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: production
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+      annotations:
+        secret.reloader.stakater.com/reload: "payment-secret"
+    spec:
+      containers:
+        - name: payment-service
+          image: payment-service:1.2.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secret
+                  key: api-token
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secret
+                  key: db-password
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/secrets
+              readOnly: true
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: payment-secret
